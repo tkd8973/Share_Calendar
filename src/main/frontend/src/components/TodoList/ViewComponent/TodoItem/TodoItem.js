@@ -1,11 +1,10 @@
 import React from "react";
 import PropTypes from "prop-types";
 import styled, { css } from "styled-components";
-import DeleteIcon from "@material-ui/icons/Delete";
-import DoneIcon from "@material-ui/icons/Done";
-
+import DeleteIcon from "@mui/icons-material/Delete";
+import DoneIcon from "@mui/icons-material/Done";
 const Remove = styled.div`
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
   color: #dee2e6;
@@ -14,7 +13,6 @@ const Remove = styled.div`
   &:hover {
     color: #ff6bc6;
   }
-  display: none;
 `;
 
 const TodoItemBlock = styled.div`
@@ -40,8 +38,8 @@ const CheckCircle = styled.div`
   justify-content: center;
   margin-right: 10px;
   cursor: pointer;
-  ${props =>
-    props.done &&
+  ${({ done }) =>
+    done &&
     css`
       border: 1px solid #38d9a9;
       color: #38d9a9;
@@ -53,8 +51,8 @@ const Text = styled.div`
   font-size: 16px;
   font-weight: 700;
   color: #495057;
-  ${props =>
-    props.done &&
+  ${({ done }) =>
+    done &&
     css`
       color: #ced4da;
     `}
@@ -63,7 +61,7 @@ const Text = styled.div`
 const TodoItem = ({ id, done, text, handleRemove, handleToggle }) => {
   return (
     <TodoItemBlock>
-      <CheckCircle onClick={() => handleToggle(id)} {...done && { done }}>
+      <CheckCircle onClick={() => handleToggle(id)} done={done}>
         {done && <DoneIcon fontSize="small" />}
       </CheckCircle>
       <Text done={done}>{text}</Text>
@@ -75,23 +73,11 @@ const TodoItem = ({ id, done, text, handleRemove, handleToggle }) => {
 };
 
 TodoItem.propTypes = {
-  id: PropTypes.number,
-  done: PropTypes.bool,
-  text: PropTypes.string,
-  handleRemove: PropTypes.func,
-  handleToggle: PropTypes.func
-};
-
-TodoItem.defaultProps = {
-  id: -1,
-  done: false,
-  text: "Item Text is null",
-  handleRemove: () => {
-    console.log("handleRemove is null");
-  },
-  handleToggle: () => {
-    console.log("handleToggle is null");
-  }
+  id: PropTypes.number.isRequired,
+  done: PropTypes.bool.isRequired,
+  text: PropTypes.string.isRequired,
+  handleRemove: PropTypes.func.isRequired,
+  handleToggle: PropTypes.func.isRequired
 };
 
 export default TodoItem;

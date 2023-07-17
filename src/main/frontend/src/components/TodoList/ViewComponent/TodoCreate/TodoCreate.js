@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import PropTypes from "prop-types";
 import styled, { css } from 'styled-components';
-import AddIcon from '@material-ui/icons/Add';
+import AddIcon from '@mui/icons-material/Add';
+
 
 const CircleButton = styled.div`
   background: #38d9a9;
@@ -16,6 +16,7 @@ const CircleButton = styled.div`
   cursor: pointer;
   width: 40px;
   height: 40px;
+  display: block;
   align-items: center;
   justify-content: center;
   font-size: 60px;
@@ -28,9 +29,12 @@ const CircleButton = styled.div`
   border: none;
   outline: none;
   display: flex;
+  align-items: center;
+  justify-content: center;
+
   transition: 0.125s all ease-in;
-  ${({ open }) =>
-    open &&
+  ${props =>
+    props.open &&
     css`
       background: #ff6b6b;
       &:hover {
@@ -40,7 +44,7 @@ const CircleButton = styled.div`
         background: #fa5252;
       }
       transform: translate(-50%, -20%) rotate(45deg);
-    `};
+    `}
 `;
 
 const InsertFormPositioner = styled.div`
@@ -70,87 +74,45 @@ const Input = styled.input`
   outline: none;
   font-size: 18px;
   box-sizing: border-box;
-
-  /* 스타일 추가: 배경 색상 */
-  background-color: white;
+`;
+const CheckboxWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
 `;
 
+const CheckboxLabel = styled.label`
+  margin-left: 8px;
+  font-size: 16px;
+`;
 const TodoCreate = ({
   open,
   value,
-  currentDay,
-  currentMonth,
-  currentYear,
   handleChange,
   handleSubmit,
-  handleToggle
+  handleToggle,
+  shared, // Add the shared prop
+  handleShareToggle
 }) => {
-  const [userId, setUserId] = useState('');
-  const [share, setShare] = useState(false);
-  const [schedule, setSchedule] = useState('');
-
-  const formattedDate = `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(currentDay).padStart(2, '0')}`;
-
-  const createSchedule = async () => {
-    try {
-      const response = await axios.post(`/calendar/setSchedule/userId=${userId}`, {
-        date: formattedDate.replace(/-/g, ''),
-        share,
-        schedule
-      });
-      console.log(response.data); // Schedule created successfully
-      clearForm();
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const handleDateChange = (e) => {
-    e.preventDefault(); // Prevent the default form submission behavior
-    console.log("Cannot change the selected date");
-  };
-
-  const clearForm = () => {
-    setUserId('');
-    setShare(false);
-    setSchedule('');
-    handleChange('');
-    handleToggle();
-  }; 
-
-  return (  
+  return (
     <>
       {open && (
         <InsertFormPositioner>
           <InsertForm onSubmit={handleSubmit}>
             <Input
               autoFocus
-              placeholder="Enter your task and press Enter"
+              placeholder="할 일을 입력 후, Enter 를 누르세요"
               onChange={handleChange}
               value={value}
             />
-            <Input
-              placeholder="User ID"
-              value={userId}
-              onChange={(e) => setUserId(e.target.value)}
-            />
-            <Input
-              type="date"
-              placeholder="Date"
-              value={formattedDate}
-              onChange={handleDateChange}
-              readOnly
-            />
-            <label>
-              Share:
+            <CheckboxWrapper>
               <input
                 type="checkbox"
-                checked={share}
-                onChange={(e) => setShare(e.target.checked)}
+                checked={shared}
+                onChange={handleShareToggle} // Use the handleCheckboxChange prop
               />
-            </label>   
-            
-            <button type="button" onClick={createSchedule}>Create</button>         
+              <CheckboxLabel>Share</CheckboxLabel>
+            </CheckboxWrapper>
           </InsertForm>
         </InsertFormPositioner>
       )}
@@ -159,6 +121,28 @@ const TodoCreate = ({
       </CircleButton>
     </>
   );
+};
+
+TodoCreate.propTypes = {
+  open: PropTypes.bool,
+  value: PropTypes.string,
+  handleChange: PropTypes.func,
+  handleSubmit: PropTypes.func,
+  handleToggle: PropTypes.func
+};
+
+TodoCreate.defaultProps = {
+  open: false,
+  value: "",
+  handleChange: () => {
+    console.log("handleChange is null.");
+  },
+  handleSubmit: () => {
+    console.log("handleChange is null.");
+  },
+  handleToggle: () => {
+    console.log("handleChange is null.");
+  }
 };
 
 export default TodoCreate;

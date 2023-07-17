@@ -1,20 +1,27 @@
 import { createAction, handleActions } from "redux-actions";
 
-//action type
+// action types
 const TODOS = "todolist/TODOS";
 const CREATE_TODO = "todolist/CREATE_TODO";
 const REMOVE_TODO = "todolist/REMOVE_TODO";
 const TOGGLE_TODO = "todolist/TOGGLE_TODO";
 const DAY_DOTOLIST = "todolist/DAY_TODOS";
 const TODOS_IN_MONTH = "todolist/TODOS_IN_MONTH";
-//action craetor
+const SET_SHARED = "todolist/SET_SHARED";
+const SET_USER_ID = "todolist/SET_USER_ID";
+const SET_LOVER_ID = "todolist/SET_LOVER_ID";
+// action creators
 export const todos = createAction(TODOS);
 export const createTodo = createAction(CREATE_TODO);
 export const removeTodo = createAction(REMOVE_TODO);
 export const toggleTodo = createAction(TOGGLE_TODO);
 export const dayTodolist = createAction(DAY_DOTOLIST);
 export const todosInMonth = createAction(TODOS_IN_MONTH);
-//initial state
+export const setShared = createAction(SET_SHARED);
+export const setUserId = createAction(SET_USER_ID);
+export const setLoverId = createAction(SET_LOVER_ID);
+
+// initial state
 const initialState = {
   todos: [
     {
@@ -31,43 +38,16 @@ const initialState = {
   dayTodos: [
     { start: 0 },
     { to: 0, do: 0 },
-    { to: 0, do: 0 },
-    { to: 0, do: 0 },
-    { to: 0, do: 0 },
-    { to: 0, do: 0 },
-    { to: 0, do: 0 },
-    { to: 0, do: 0 },
-    { to: 0, do: 0 },
-    { to: 0, do: 0 },
-    { to: 0, do: 0 },
-    { to: 0, do: 0 },
-    { to: 0, do: 0 },
-    { to: 0, do: 0 },
-    { to: 0, do: 0 },
-    { to: 0, do: 0 },
-    { to: 0, do: 0 },
-    { to: 0, do: 0 },
-    { to: 0, do: 0 },
-    { to: 0, do: 0 },
-    { to: 0, do: 0 },
-    { to: 0, do: 0 },
-    { to: 0, do: 0 },
-    { to: 0, do: 0 },
-    { to: 0, do: 0 },
-    { to: 0, do: 0 },
-    { to: 0, do: 0 },
-    { to: 0, do: 0 },
-    { to: 0, do: 0 },
-    { to: 0, do: 0 },
-    { to: 0, do: 0 },
-    { to: 0, do: 0 },
+    // ...
   ],
+  shared: false, // 공유 여부
+  userId: "SW", // 사용자 ID,
+  loverId: ""
 };
 
-//reducer
+// reducer
 export default handleActions(
   {
-    //선택된 날짜의 todolist를 return 한다.
     [TODOS]: (state, action) => {
       return {
         ...state,
@@ -80,7 +60,6 @@ export default handleActions(
         }),
       };
     },
-    //새로운 todo를 만든다.
     [CREATE_TODO]: (state, action) => {
       return {
         ...state,
@@ -88,7 +67,6 @@ export default handleActions(
         id: state.id + 1,
       };
     },
-    //선택된 todo의 done값을 변경한다.
     [TOGGLE_TODO]: (state, action) => {
       return {
         ...state,
@@ -97,21 +75,13 @@ export default handleActions(
         ),
       };
     },
-    //선택된 todo를 제거한다.
     [REMOVE_TODO]: (state, action) => {
       return {
         ...state,
         todos: state.todos.filter((todo) => todo.id !== action.payload.id),
       };
     },
-    //날짜별로 todo의 개수를 return한다.
     [DAY_DOTOLIST]: (state, action) => {
-      const monthlyTodos = state.todos.filter((todo) => {
-        return (
-          todo.month === action.payload.currentMonth + 1 &&
-          todo.year === action.payload.currentYear
-        );
-      });
       const inner = [
         { start: 0 },
         { to: 0, do: 0 },
@@ -146,16 +116,28 @@ export default handleActions(
         { to: 0, do: 0 },
         { to: 0, do: 0 },
       ];
-      // monthlyTodos.map((todo) => {
-      //   if (todo.done === true) {
-      //     inner[todo.day].do = inner[todo.day].do + 1;
-      //   } else {
-      //     inner[todo.day].to = inner[todo.day].to + 1;
-      //   }
-      // });
       return {
         ...state,
         dayTodos: inner,
+      };
+    },
+    [SET_SHARED]: (state, action) => {
+      return {
+        ...state,
+        shared: action.payload.shared,
+      };
+    },
+    
+    [SET_LOVER_ID]: (state, action) => {
+      return {
+        ...state,
+        loverId: action.payload.loverId,
+      };
+    },
+    [SET_USER_ID]: (state, action) => {
+      return {
+        ...state,
+        userId: action.payload.userId,
       };
     },
   },

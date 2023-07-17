@@ -1,8 +1,8 @@
 import React from "react";
 import styled, { css } from "styled-components";
-import NavigateBeforeIcon from "@material-ui/icons/NavigateBefore";
-import NavigateNextIcon from "@material-ui/icons/NavigateNext";
-import DoneIcon from "@material-ui/icons/Done";
+import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import DoneIcon from '@mui/icons-material/Done';
 const borderColor = "#D5D5D5";
 
 const StyledCalendar = styled.div`
@@ -190,12 +190,12 @@ const ViewComponent = ({
             <StyledDay today={check}>
               <div>{date}</div>
             </StyledDay>
-            {dayTodos[innerDate].to + dayTodos[innerDate].do !== 0 && (
-              <CalendarTodo
-                ToDay={dayTodos[innerDate].to}
-                DoDay={dayTodos[innerDate].do}
-              />
-            )}
+            {dayTodos[innerDate] && dayTodos[innerDate].to + dayTodos[innerDate].do !== 0 && (
+          <CalendarTodo
+            ToDay={dayTodos[innerDate].to}
+            DoDay={dayTodos[innerDate].do}
+          />
+        )}
           </StyledTd>
         );
         date++;

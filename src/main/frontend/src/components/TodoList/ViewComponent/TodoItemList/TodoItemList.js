@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import styled from "styled-components";
 import TodoItem from "../TodoItem/TodoItem";
 
+
 const TodoListBlock = styled.div`
   flex: 1;
   padding: 20px 32px;
@@ -10,30 +11,30 @@ const TodoListBlock = styled.div`
   overflow-y: auto;
 `;
 
-const StyledText = styled.div`
-  margin-top: 70px;
-  text-align: center;
-  font-weight: 700;
-`;
 
-const TodoItemList = ({ todos = [], handleToggle, handleRemove }) => {
-  if (!Array.isArray(todos)) {
-    todos = [];
-  }
-
+const TodoItemList = ({ todos, handleToggle, handleRemove, loverId }) => {
   return (
     <div>
-      {todos.map((todo) => (
-        <TodoItem
-          key={todo.id} // Add a unique "key" prop here
-          todo={todo}
-          handleToggle={handleToggle}
-          handleRemove={handleRemove}
-        />
-      ))}
+      {todos.map((todo) => {
+        if (todo.shared && todo.LoverId === loverId) {
+          return (
+            <TodoItem
+              key={todo.id}
+              id={todo.id}
+              text={todo.text}
+              done={todo.done}
+              handleToggle={handleToggle}
+              handleRemove={handleRemove}
+            />
+          );
+        } else {
+          return null;
+        }
+      })}
     </div>
   );
 };
+
 
 TodoItemList.propTypes = {
   todos: PropTypes.arrayOf(
