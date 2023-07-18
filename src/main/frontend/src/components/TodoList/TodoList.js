@@ -11,8 +11,10 @@ import {
   toggleTodo,
   removeTodo,
   todos,
+  clearTodos
 } from "../../store/modules/todolist";
 import axios from 'axios';
+import { useInsertionEffect } from "react";
 const TodoTemplateBlock = styled.div`
   display: flex;
   position: relative;
@@ -44,52 +46,68 @@ const TodoList = () => {
     currentMonth: state.date.currentMonth,
     currentYear: state.date.currentYear,
   }));
+
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // 데이터를 가져오는 axios 요청
         const response = await axios.get("/calendar/getSchedule/userId=SW");
         const data = response.data;
-  
-        let transformedTodo;
-  
-        if (data.shared) {
-          // 공유된 일정인 경우
-          transformedTodo = {
-            id,
-            shared: data.shared,
-            year: currentYear,
-            month: currentMonth,
-            day: currentDay,
-            text: data.shareScheduleContent,
-            done: false,
-            userId: data.shareScheduleWriterId,
-            LoverId: data.shareScheduleLoverId
-          };
-        } else {
-          // 개인 일정인 경우
-          transformedTodo = {
-            id,
-            shared: data.shared,
-            year: currentYear,
-            month: currentMonth,
-            day: currentDay,
-            text: data.myScheduleContent,
-            done: false,
-            userId: data.writerId
-          };
-        }
-  
-        // 가져온 데이터를 Redux 상태로 저장
-        dispatch(todos(transformedTodo));
+
+        // 기존의 todos 상태 초기화
+        dispatch(clearTodos());
+
+        // 중복을 제외하고 새로운 데이터만 처리
+        data.forEach((item) => {
+          if (!item.shared) {
+            const [year, month, day] = item.myScheduleDate.split("-");
+            const todo = {
+              id: item.myScheduleId,
+              year: parseInt(year),
+              month: parseInt(month),
+              day: parseInt(day),
+              shared: item.shared,
+              text: item.myScheduleContent,
+              writer: item.writerId,
+            };
+            dispatch(createTodo({ todo }));
+          } else {
+            const [year, month, day] = item.shareScheduleDate.split("-");
+            const todo = {
+              id: item.shareScheduleId,
+              year: parseInt(year),
+              month: parseInt(month),
+              day: parseInt(day),
+              shared: item.shared,
+              text: item.shareScheduleContent,
+              writer: item.shareScheduleWriterId,
+            };
+            dispatch(createTodo({ todo }));
+          }
+        });
+
+        dispatch(
+          actionTodos({
+            currentDay,
+            currentMonth,
+            currentYear,
+          })
+        );
+        dispatch(
+          dayTodolist({
+            currentMonth: currentMonth - 1,
+            currentYear,
+          })
+        );
       } catch (error) {
         console.error(error);
       }
     };
-  
+
     fetchData();
-  }, [dispatch, id, currentYear, currentMonth, currentDay]);
-  
+  }, [currentDay, currentMonth, currentYear]);
+
+
   const handleToggleAndFetch = (id) => {
     dispatch(toggleTodo({ id }));
     dispatch(
@@ -130,7 +148,6 @@ const TodoList = () => {
   }
   const handleCreateToggle = () => {
     setOpen((prevOpen) => !prevOpen);
-
   };
 
   const handleCreateChange = (e) => {
@@ -145,19 +162,15 @@ const TodoList = () => {
         schedule: value,
         date: `${currentYear}-${currentMonth.toString().padStart(2, '0')}-${currentDay.toString().padStart(2, '0')}`,
         share: shared,
-      });
-  
+      });  
+
       const todo = {
         id,
-        shared:shared,
         year: currentYear,
         month: currentMonth,
         day: currentDay,
         text: value,
-        done: false,
-        userId:"SW"
       };
-  
       dispatch(createTodo({ todo }));
       dispatch(
         actionTodos({
@@ -172,14 +185,13 @@ const TodoList = () => {
           currentYear,
         })
       );
-  
       setValue("");
       setOpen(false);
       console.log(response.data); // Schedule create successfully
     } catch (error) {
       console.error(error);
     }
-  };
+  };  
   return (
     <TodoTemplateBlock>
       <TodoHead
@@ -193,7 +205,6 @@ const TodoList = () => {
         todos={filteredTodos?.length ? filteredTodos : []}
         handleToggle={handleToggleAndFetch}
         handleRemove={handleRemoveAndFetch}
-        loverId={LoverId} // LoverId를 전달합니다.
       />
 
       <TodoCreate
@@ -202,7 +213,6 @@ const TodoList = () => {
         handleChange={handleCreateChange}
         handleSubmit={handleCreateSubmit}
         handleToggle={handleCreateToggle}
-        handleShareToggle = {handleCreateShareToggle}
         currentDay={currentDay}
         currentMonth={currentMonth}
         currentYear={currentYear}

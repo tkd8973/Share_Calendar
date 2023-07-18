@@ -10,6 +10,7 @@ const TODOS_IN_MONTH = "todolist/TODOS_IN_MONTH";
 const SET_SHARED = "todolist/SET_SHARED";
 const SET_USER_ID = "todolist/SET_USER_ID";
 const SET_LOVER_ID = "todolist/SET_LOVER_ID";
+const CLEAR_TODOS = "todolist/CLEAR_TODOS";
 // action creators
 export const todos = createAction(TODOS);
 export const createTodo = createAction(CREATE_TODO);
@@ -20,7 +21,7 @@ export const todosInMonth = createAction(TODOS_IN_MONTH);
 export const setShared = createAction(SET_SHARED);
 export const setUserId = createAction(SET_USER_ID);
 export const setLoverId = createAction(SET_LOVER_ID);
-
+export const clearTodos = createAction(CLEAR_TODOS);
 // initial state
 const initialState = {
   todos: [
@@ -138,6 +139,12 @@ export default handleActions(
       return {
         ...state,
         userId: action.payload.userId,
+      };
+    },
+    [CLEAR_TODOS]: (state, action) => {
+      return{
+        ...state,
+        todos:[],
       };
     },
   },
